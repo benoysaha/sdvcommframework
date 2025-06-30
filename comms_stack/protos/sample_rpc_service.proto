@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package comms_stack.protos;
+
+option cc_generic_services = true; // Important for generating service interface
+
+message EchoRequest {
+  string request_message = 1;
+}
+
+message EchoResponse {
+  string response_message = 1;
+}
+
+message AddRequest {
+  int32 a = 1;
+  int32 b = 2;
+}
+
+message AddResponse {
+  int32 sum = 1;
+}
+
+service SampleRpc {
+  rpc Echo(EchoRequest) returns (EchoResponse);
+  rpc Add(AddRequest) returns (AddResponse);
+}
