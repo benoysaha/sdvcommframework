@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+package comms_stack.protos;
+
+// A simple notification message that could be published on a topic
+message SimpleNotification {
+  uint32 id = 1;
+  string message_content = 2;
+  uint64 timestamp = 3; // Unix timestamp (seconds since epoch)
+}
