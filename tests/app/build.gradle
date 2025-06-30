@@ -1,0 +1,23 @@
+android {
+    // ... other settings
+    defaultConfig {
+        // ...
+        externalNativeBuild {
+            cmake {
+                cppFlags ""
+                // Optional: arguments "-DANDROID_STL=c++_shared"
+            }
+        }
+    }
+    externalNativeBuild {
+        cmake {
+            path "src/main/cpp/CMakeLists.txt"
+            version "3.18.1" // Or your preferred/NDK compatible version
+        }
+    }
+    packagingOptions {
+        // You might need this if you have .so files from your prebuilt dependencies
+        // that conflict or that you want to explicitly include.
+        // e.g. pickFirst 'lib/armeabi-v7a/libboost_system.so'
+    }
+}

@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    tools:context=".MainActivity">
+
+    <Button
+        android:id="@+id/initButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Init Comms Stack" />
+
+    <EditText
+        android:id="@+id/topicEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Topic Name (e.g., TestTopic)" />
+
+    <EditText
+        android:id="@+id/messageEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Message to Publish" />
+        
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <Button
+            android:id="@+id/publishButton"
+            android:layout_width="0dp" android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="Publish" android:enabled="false"/>
+        <Button
+            android:id="@+id/subscribeButton"
+            android:layout_width="0dp" android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="Subscribe" android:enabled="false"/>
+        <Button
+            android:id="@+id/unsubscribeButton"
+            android:layout_width="0dp" android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="Unsubscribe" android:enabled="false"/>
+    </LinearLayout>
+
+    <EditText
+        android:id="@+id/serviceNameEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Service Name (e.g., SampleRpc)" />
+        
+    <EditText
+        android:id="@+id/echoMessageEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Message for Echo RPC" />
+    <Button
+        android:id="@+id/rpcEchoButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Call RPC Echo" android:enabled="false"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <EditText
+            android:id="@+id/addAEditText"
+            android:layout_width="0dp" android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:hint="Num A" android:inputType="numberSigned"/>
+        <EditText
+            android:id="@+id/addBEditText"
+            android:layout_width="0dp" android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:hint="Num B" android:inputType="numberSigned"/>
+    </LinearLayout>
+    <Button
+        android:id="@+id/rpcAddButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Call RPC Add" android:enabled="false"/>
+        
+    <Button
+        android:id="@+id/clearLogButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:text="Clear Log"/>
+
+    <ScrollView
+        android:id="@+id/outputScrollView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginTop="8dp"
+        android:background="#f0f0f0">
+        <TextView
+            android:id="@+id/outputTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:textIsSelectable="true"
+            android:textAppearance="@style/TextAppearance.AppCompat.Small" />
+    </ScrollView>
+</LinearLayout>
