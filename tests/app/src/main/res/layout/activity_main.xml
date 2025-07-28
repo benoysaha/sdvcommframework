@@ -83,6 +83,58 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Call RPC Add" android:enabled="false"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <Button
+            android:id="@+id/connectCarButton"
+            android:layout_width="0dp" android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="Connect Car"/>
+        <Button
+            android:id="@+id/disconnectCarButton"
+            android:layout_width="0dp" android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="Disconnect Car" android:enabled="false"/>
+    </LinearLayout>
+
+    <EditText
+        android:id="@+id/propertyIdEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Property ID" android:inputType="number"/>
+    <EditText
+        android:id="@+id/areaIdEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Area ID" android:inputType="number"/>
+    <EditText
+        android:id="@+id/propertyValueEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Value to Set"/>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <Button
+            android:id="@+id/getPropertyButton"
+            android:layout_width="0dp" android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="Get" android:enabled="false"/>
+        <Button
+            android:id="@+id/setPropertyButton"
+            android:layout_width="0dp" android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="Set" android:enabled="false"/>
+        <Button
+            android:id="@+id/subscribePropertyButton"
+            android:layout_width="0dp" android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="Subscribe" android:enabled="false"/>
+    </LinearLayout>
         
     <Button
         android:id="@+id/clearLogButton"

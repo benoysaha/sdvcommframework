@@ -95,6 +95,9 @@ else() # Host linking (existing logic)
     endif()
 endif()
 
+add_executable(vhal_client src/vhal_client.cpp)
+target_link_libraries(vhal_client PRIVATE comms_stack_lib)
+
 # --- Protobuf Code Generation (Example, will be detailed in next step) --- # This was from previous merge, already implemented above
 # file(GLOB PROTO_FILES "${CMAKE_CURRENT_SOURCE_DIR}/protos/*.proto")
 #

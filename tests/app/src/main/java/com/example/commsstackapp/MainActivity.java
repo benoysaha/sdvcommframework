@@ -26,8 +26,8 @@ public class MainActivity extends AppCompatActivity {
     private CommsStackBridge commsBridge;
     private TextView outputTextView;
     private ScrollView outputScrollView;
-    private EditText topicEditText, messageEditText, serviceNameEditText, echoMessageEditText, addAEditText, addBEditText;
-    private Button initButton, publishButton, subscribeButton, unsubscribeButton, rpcEchoButton, rpcAddButton, clearLogButton;
+    private EditText topicEditText, messageEditText, serviceNameEditText, echoMessageEditText, addAEditText, addBEditText, propertyIdEditText, areaIdEditText, propertyValueEditText;
+    private Button initButton, publishButton, subscribeButton, unsubscribeButton, rpcEchoButton, rpcAddButton, clearLogButton, connectCarButton, disconnectCarButton, getPropertyButton, setPropertyButton, subscribePropertyButton;
 
     private long currentSubscriptionId = -1;
     private final Handler uiHandler = new Handler(Looper.getMainLooper());
@@ -56,6 +56,14 @@ public class MainActivity extends AppCompatActivity {
         rpcEchoButton = findViewById(R.id.rpcEchoButton);
         rpcAddButton = findViewById(R.id.rpcAddButton);
         clearLogButton = findViewById(R.id.clearLogButton);
+        connectCarButton = findViewById(R.id.connectCarButton);
+        disconnectCarButton = findViewById(R.id.disconnectCarButton);
+        propertyIdEditText = findViewById(R.id.propertyIdEditText);
+        areaIdEditText = findViewById(R.id.areaIdEditText);
+        propertyValueEditText = findViewById(R.id.propertyValueEditText);
+        getPropertyButton = findViewById(R.id.getPropertyButton);
+        setPropertyButton = findViewById(R.id.setPropertyButton);
+        subscribePropertyButton = findViewById(R.id.subscribePropertyButton);
 
         topicEditText.setText("TestTopic");
         serviceNameEditText.setText("SampleRpc");
@@ -70,6 +78,12 @@ public class MainActivity extends AppCompatActivity {
         rpcEchoButton.setOnClickListener(v -> backgroundExecutor.execute(this::callRpcEcho));
         rpcAddButton.setOnClickListener(v -> backgroundExecutor.execute(this::callRpcAdd));
         clearLogButton.setOnClickListener(v -> outputTextView.setText(""));
+        connectCarButton.setOnClickListener(v -> backgroundExecutor.execute(this::connectCar));
+        disconnectCarButton.setOnClickListener(v -> backgroundExecutor.execute(this::disconnectCar));
+        getPropertyButton.setOnClickListener(v -> backgroundExecutor.execute(this::getProperty));
+        setPropertyButton.setOnClickListener(v -> backgroundExecutor.execute(this::setProperty));
+        subscribePropertyButton.setOnClickListener(v -> backgroundExecutor.execute(this::subscribeProperty));
+
 
         logToUi("App started. Press INIT.");
     }
@@ -205,6 +219,83 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private void connectCar() {
+        if (commsBridge.connectToCar(this)) {
+            logToUi("Car connected successfully.");
+            runOnUiThread(() -> {
+                connectCarButton.setEnabled(false);
+                disconnectCarButton.setEnabled(true);
+                getPropertyButton.setEnabled(true);
+                setPropertyButton.setEnabled(true);
+                subscribePropertyButton.setEnabled(true);
+            });
+        } else {
+            logToUi("Failed to connect to car.");
+        }
+    }
+
+    private void disconnectCar() {
+        commsBridge.disconnectFromCar();
+        logToUi("Car disconnected.");
+        runOnUiThread(() -> {
+            connectCarButton.setEnabled(true);
+            disconnectCarButton.setEnabled(false);
+            getPropertyButton.setEnabled(false);
+            setPropertyButton.setEnabled(false);
+            subscribePropertyButton.setEnabled(false);
+        });
+    }
+
+    private void getProperty() {
+        try {
+            int propertyId = Integer.parseInt(propertyIdEditText.getText().toString());
+            int areaId = Integer.parseInt(areaIdEditText.getText().toString());
+            Object value = commsBridge.getVhalProperty(propertyId, areaId);
+            logToUi("Get Property Response: " + value);
+        } catch (NumberFormatException e) {
+            logToUi("Get Property Error: Invalid property or area ID.");
+        }
+    }
+
+    private void setProperty() {
+        try {
+            int propertyId = Integer.parseInt(propertyIdEditText.getText().toString());
+            int areaId = Integer.parseInt(areaIdEditText.getText().toString());
+            String valueStr = propertyValueEditText.getText().toString();
+            // This is a simplification. A real implementation would need to parse the value
+            // based on the property type.
+            Object value;
+            try {
+                value = Integer.parseInt(valueStr);
+            } catch (NumberFormatException e1) {
+                try {
+                    value = Float.parseFloat(valueStr);
+                } catch (NumberFormatException e2) {
+                    if (valueStr.equalsIgnoreCase("true") || valueStr.equalsIgnoreCase("false")) {
+                        value = Boolean.parseBoolean(valueStr);
+                    } else {
+                        value = valueStr;
+                    }
+                }
+            }
+            commsBridge.setVhalProperty(propertyId, areaId, value);
+            logToUi("Set Property Request sent.");
+        } catch (NumberFormatException e) {
+            logToUi("Set Property Error: Invalid property or area ID.");
+        }
+    }
+
+    private void subscribeProperty() {
+        try {
+            int propertyId = Integer.parseInt(propertyIdEditText.getText().toString());
+            int areaId = Integer.parseInt(areaIdEditText.getText().toString());
+            commsBridge.subscribeToVhalProperty(propertyId, areaId, CarPropertyManager.SENSOR_RATE_NORMAL);
+            logToUi("Subscribed to property: " + propertyId);
+        } catch (NumberFormatException e) {
+            logToUi("Subscribe Property Error: Invalid property or area ID.");
+        }
+    }
+
     private void logToUi(String message) {
         Log.d(TAG, message); 
         uiHandler.post(() -> {
@@ -227,6 +318,7 @@ public class MainActivity extends AppCompatActivity {
                 currentSubscriptionId = -1;
                  logToUi("Unsubscribed during onDestroy.");
             }
+            disconnectCar();
             commsBridge.nativeShutdown();
             logToUi("Native shutdown completed.");
         });

@@ -15,6 +15,7 @@
 #include "rpc_client.h"
 #include "common_messages.pb.h"    // For SimpleNotification
 #include "sample_rpc_service.pb.h" // For EchoRequest/Response, AddRequest/Response
+#include "vhal.pb.h" // For VHAL messages
 
 // JNI OnLoad / OnUnload (optional but good practice)
 JavaVM* g_java_vm = nullptr;
@@ -325,5 +326,54 @@ JNIEXPORT void JNICALL Java_com_example_commsstack_CommsStackBridge_nativeCallAd
     if(listener_global_ref) env->DeleteGlobalRef(listener_global_ref);
 }
 
+// VHAL Integration
+
+JNIEXPORT void JNICALL
+Java_com_example_commsstackapp_CommsStackBridge_nativeOnVhalPropertyUpdate(
+    JNIEnv* env, jobject /* this */, jint propertyId, jint areaId,
+    jboolean boolValue, jfloat floatValue, jint intValue,
+    jstring stringValue, jbyteArray bytesValue, jlong int64Value) {
+
+    vhal::VhalPropertyUpdate update;
+    vhal::VhalProperty* prop = update.mutable_property();
+    prop->set_id(propertyId);
+    prop->set_area_id(areaId);
+
+    // This is a simplification. A real implementation would need to know the type
+    // of the property to correctly set the oneof field.
+    // For now, we'll just check which value is non-default.
+    if (boolValue) {
+        prop->set_bool_value(boolValue);
+    } else if (floatValue != 0.0f) {
+        prop->set_float_value(floatValue);
+    } else if (intValue != 0) {
+        prop->set_int32_value(intValue);
+    } else if (stringValue != nullptr) {
+        prop->set_string_value(jstringToStdString(env, stringValue));
+    } else if (bytesValue != nullptr) {
+        jbyte* elements = env->GetByteArrayElements(bytesValue, nullptr);
+        jsize length = env->GetArrayLength(bytesValue);
+        prop->set_bytes_value(elements, length);
+        env->ReleaseByteArrayElements(bytesValue, elements, JNI_ABORT);
+    } else if (int64Value != 0) {
+        prop->set_int64_value(int64Value);
+    }
+
+    // Now, publish this update using the communication stack
+    // This assumes a publisher has been set up for VHAL updates.
+    // For simplicity, we'll create a new publisher each time.
+    auto& comm_mgr = comms_stack::CommunicationManager::getInstance();
+    auto vsomeip_app = comm_mgr.getVsomeipApplication();
+    if (!vsomeip_app) return;
+
+    // Topic name for VHAL updates
+    const std::string topicName = "vhal_property_updates";
+    const uint16_t service_id = 0x3333;
+    const uint16_t instance_id = 0x0001;
+    const uint16_t eventgroup_id = 0x9200;
+
+    comms_stack::Publisher publisher(topicName, vsomeip_app, service_id, instance_id, eventgroup_id, true);
+    publisher.publish(update);
+}
 
 } // extern "C"
